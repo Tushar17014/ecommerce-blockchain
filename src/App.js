@@ -10,7 +10,7 @@ import Section from './components/Section'
 import Blockcart from './abis/Blockcart.json'
 
 // Config
-import config from './config.json'
+// import config from './config.json'
 
 function App() {
 
@@ -29,26 +29,26 @@ function App() {
     toggle ? setToggle(false) : setToggle(true)
   }
 
+  console.log(provider, blockcart, item)
+
   const BlockChainData = async ()=>{
     const provider = new ethers.providers.Web3Provider(window.ethereum)
     setProvider(provider)
     const network = await provider.getNetwork() 
+    console.log(network)
     const blockcart = new ethers.Contract("0x5fbdb2315678afecb367f032d93f642f64180aa3", Blockcart, provider)
     setBlockcart(blockcart)
-    console.log(blockcart)
     const items = []
     for (var i = 0; i < 9; i++) {
       const item = await blockcart.items(i + 1)
       items.push(item)
     }
-    console.log(items);
     const electronics = items.filter((item) => item.category === 'electronics')
     const clothing = items.filter((item) => item.category === 'clothing')
     const toys = items.filter((item) => item.category === 'toys')
     setElectronics(electronics)
     setClothing(clothing)
     setToys(toys)
-    console.log(electronics)
   }
   useEffect(()=>{
     BlockChainData();
