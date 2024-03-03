@@ -12,7 +12,6 @@ const Navigation = ({ account, setAccount }) => {
                 <h1>Blockcart</h1>
             </div>
             <input type='text' className='nav__search'></input>
-
             {account ? (
                 <button
                     type="button"

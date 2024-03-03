@@ -1,69 +1,50 @@
-import { useEffect, useState } from 'react'
-import { ethers } from 'ethers'
+import { useState, useEffect } from 'react'
 
 // Components
 import Navigation from './components/Navigation'
-import Section from './components/Section'
-// import Product from './components/Product'
+import Section2 from './components/Section2.js';
 
-// ABIs
-import Blockcart from './abis/Blockcart.json'
+// firebase
+import db from './firebase'
+import { get, ref } from 'firebase/database'
+import Section2 from './components/Section2.js';
 
-// Config
-// import config from './config.json'
 
 function App() {
 
   const [account, setAccount] = useState(null)
-  const [provider, setProvider] = useState(null)
-  const [blockcart, setBlockcart] = useState(null)
-  const [electronics, setElectronics] = useState(null)
-  const [clothing, setClothing] = useState(null)
-  const [toys, setToys] = useState(null)
-
-  const [item, setItem] = useState({})
-  const [toggle, setToggle] = useState(false)
-
-  const togglePop = (item) => {
-    setItem(item)
-    toggle ? setToggle(false) : setToggle(true)
-  }
-
-  console.log(provider, blockcart, item)
-
-  const BlockChainData = async ()=>{
-    const provider = new ethers.providers.Web3Provider(window.ethereum)
-    setProvider(provider)
-    const network = await provider.getNetwork() 
-    console.log(network)
-    const blockcart = new ethers.Contract("0x5fbdb2315678afecb367f032d93f642f64180aa3", Blockcart, provider)
-    setBlockcart(blockcart)
-    const items = []
-    for (var i = 0; i < 9; i++) {
-      const item = await blockcart.items(i + 1)
-      items.push(item)
-    }
-    const electronics = items.filter((item) => item.category === 'electronics')
-    const clothing = items.filter((item) => item.category === 'clothing')
-    const toys = items.filter((item) => item.category === 'toys')
-    setElectronics(electronics)
-    setClothing(clothing)
-    setToys(toys)
-  }
+  const [items, setItems] = useState([]);
+  
   useEffect(()=>{
-    BlockChainData();
-  },[])
+      const Ref = ref(db, "items");
+      get(Ref).then((snapshot) =>{
+          if(snapshot.exists()){
+              const datas = Object.entries(snapshot.val()).map(([id, data]) => ({
+                  id,
+                  ...data
+              }));
+              setItems(datas);
+              
+          }
+      }).catch((error) => {
+          console.log(error);
+      })
+  }, []);
+
+  const electronics = items.filter((item) => item.category === 'electronics')
+  const clothing = items.filter((item) => item.category === 'clothing')
+  const toys = items.filter((item) => item.category === 'toys')
 
   return (
     <div>
       <Navigation account={account} setAccount={setAccount}></Navigation>
       <h2>Welcome to Blockcart</h2>
-      {electronics && clothing && toys && (
-        <>
-          <Section title={"Clothing & Jewelry"} items={clothing} togglePop={togglePop} />
-          <Section title={"Electronics & Gadgets"} items={electronics} togglePop={togglePop} />
-          <Section title={"Toys & Gaming"} items={toys} togglePop={togglePop} />
-        </>
+      {electronics && clothing && toys &&(
+       <>
+      <Section2 title={"Clothing & Jewellery"} items={clothing}></Section2>
+      <Section2 title={"Electronics & Gadgets"} items={electronics}></Section2>
+      <Section2 title={"Toys & Gaming"} items={toys}></Section2>
+      </>
       )}
     </div>
   );
