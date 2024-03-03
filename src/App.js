@@ -7,7 +7,6 @@ import Section2 from './components/Section2.js';
 // firebase
 import db from './firebase'
 import { get, ref } from 'firebase/database'
-import Section2 from './components/Section2.js';
 
 
 function App() {
